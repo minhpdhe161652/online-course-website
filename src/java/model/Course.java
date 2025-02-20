@@ -8,11 +8,13 @@ public class Course {
     private double price;
     private String imageURL;
     private String instructorName;
+    private String language;
+    private String createdDate;
 
     public Course() {
     }
 
-    public Course(int courseID, String courseName, String description, String levelName, double price, String imageURL, String instructorName) {
+    public Course(int courseID, String courseName, String description, String levelName, double price, String imageURL, String instructorName, String language, String createdDate) {
         this.courseID = courseID;
         this.courseName = courseName;
         this.description = description;
@@ -20,7 +22,11 @@ public class Course {
         this.price = price;
         this.imageURL = imageURL;
         this.instructorName = instructorName;
+        this.language = language;
+        this.createdDate = createdDate;
     }
+
+    
 
     public int getCourseID() {
         return courseID;
@@ -53,6 +59,7 @@ public class Course {
     public void setLevelName(String levelName) {
         this.levelName = levelName;
     }
+        
 
     public double getPrice() {
         return price;
@@ -77,6 +84,24 @@ public class Course {
     public void setInstructorName(String instructorName) {
         this.instructorName = instructorName;
     }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
+    
+    
 
     
     

@@ -8,7 +8,7 @@ public class DBUtil {
 
     private static final String JDBC_URL = "jdbc:sqlserver://localhost:1433;databaseName=OnlineLearningDB;encrypt=true;trustServerCertificate=true;";
     private static final String JDBC_USERNAME = "sa";
-    private static final String JDBC_PASSWORD = "123456";
+    private static final String JDBC_PASSWORD = "123";
 
     static {
         try {
