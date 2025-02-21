@@ -133,15 +133,18 @@
 
             .course-card {
                 background: #ffffff;
-                border-radius: 12px;
+                border-radius: 8px;
                 overflow: hidden;
-                transition: all 0.3s;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                transition: transform 0.2s, box-shadow 0.2s;
+                text-decoration: none;
+                color: inherit;
+                display: block;
             }
 
             .course-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+                transform: translateY(-4px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             }
 
             .course-image {
@@ -300,7 +303,7 @@
 
             <div class="course-grid">
                 <c:forEach var="course" items="${courses}">
-                    <div class="course-card">
+                    <a href="course-detail?id=${course.courseID}" class="course-card">
                         <div class="course-image" style="background-image: url('${course.imageURL}')">
                             <h2>${course.courseName}</h2>
                         </div>
@@ -315,7 +318,7 @@
                                 $${course.price}
                             </p>
                         </div>
-                    </div>
+                    </a>
                 </c:forEach>
             </div>
         </form>
