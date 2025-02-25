@@ -40,7 +40,7 @@
         <main>
             <aside>
                 <div class="profile-picture">
-                    <img src="avatar.png" alt="User Avatar">
+                    <img src="https://res.cloudinary.com/dmkanq2n0/image/upload/v1740413485/cld-sample-3.jpg" alt="User Avatar">
                 </div>
                 <h1 class="username">@<%= user.getUsername() %></h1>
                 <ul class="sidebar-menu">
@@ -189,7 +189,7 @@
                         const saveBtn = document.querySelector(".save-btn");
 
                         // Lấy input gốc từ form chính
-                        const mainFirstName = document.getElementById("name"); // Đây đang là cả họ và tên
+                        const mainFullName = document.getElementById("name");
                         const mainDob = document.getElementById("dob");
                         const mainPhone = document.getElementById("phone");
                         const mainBio = document.getElementById("bio");
@@ -205,16 +205,16 @@
                         openModalBtn.addEventListener("click", function () {
                             modal.style.display = "flex";
 
-                            // Tách họ và tên
-                            let fullName = mainFirstName.value.trim();
-                            let nameParts = fullName.split(/\s+/); // Tách theo khoảng trắng
+                            // Lấy tên đầy đủ từ input
+                            let fullName = mainFullName.value.trim();
+                            let nameParts = fullName.split(/\s+/);
 
                             if (nameParts.length > 1) {
-                                modalFirstName.value = nameParts.slice(0, -1).join(" "); // Lấy tất cả trừ phần cuối làm firstName
-                                modalLastName.value = nameParts[nameParts.length - 1]; // Lấy phần cuối làm lastName
+                                modalLastName.value = nameParts[0]; // Họ (Last Name)
+                                modalFirstName.value = nameParts.slice(1).join(" "); // Tên (First Name)
                             } else {
-                                modalFirstName.value = fullName;
-                                modalLastName.value = "";
+                                modalLastName.value = fullName;
+                                modalFirstName.value = "";
                             }
 
                             modalDob.value = mainDob.value;
@@ -232,13 +232,14 @@
                             let firstName = modalFirstName.value.trim();
                             let lastName = modalLastName.value.trim();
 
-                            // Gộp lại để hiển thị đúng trên trang chính
-                            mainFirstName.value = firstName + " " + lastName;
+                            // Đảm bảo thứ tự đúng: Họ (Last Name) đứng trước, Tên (First Name) đứng sau
+                            mainFullName.value = lastName + " " + firstName;
+
                             mainDob.value = modalDob.value;
                             mainPhone.value = modalPhone.value;
                             mainBio.value = modalBio.value;
 
-                            modal.style.display = "none"; // Đóng modal sau khi lưu
+                            modal.style.display = "none"; // Đóng modal sau khi lưu                         
                         });
 
                         // Đóng modal khi nhấn bên ngoài nội dung
@@ -248,6 +249,5 @@
                             }
                         });
                     });
-
     </script>
 </html>

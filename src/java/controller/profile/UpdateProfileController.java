@@ -63,21 +63,21 @@ public class UpdateProfileController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-
         if (session != null && session.getAttribute("username") != null) {
-            String username = (String) session.getAttribute("username"); // Lấy username từ session
+            String username = (String) session.getAttribute("username");
 
-            // Gọi DAO để lấy thông tin user từ username
+            // ✅ Gọi DAO để lấy thông tin user từ username
             User user = UserDAO.getProfile(username);
-
             if (user != null) {
                 request.setAttribute("user", user);
                 request.getRequestDispatcher("edit-profile.jsp").forward(request, response);
             } else {
-                response.getWriter().println("User not found!");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"status\": \"error\", \"message\": \"User not found\"}");
             }
         } else {
-            response.getWriter().println("No user logged in!");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"No user logged in\"}");
         }
     }
 
@@ -102,6 +102,7 @@ public class UpdateProfileController extends HttpServlet {
         }
 
         int userId = (int) session.getAttribute("userID");
+        String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String phoneNumber = request.getParameter("phone");
         String bio = request.getParameter("bio");
@@ -116,9 +117,10 @@ public class UpdateProfileController extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        
+
         User user = new User();
         user.setUserID(userId);
+        user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
         user.setBio(bio);

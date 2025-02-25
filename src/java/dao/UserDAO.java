@@ -37,13 +37,13 @@ public class UserDAO {
                 user.setBio(rs.getString("Bio"));
                 user.setPhoneNumber(rs.getString("phoneNumber"));
                 user.setDob(rs.getDate("dob"));
-                
+
                 return user;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; 
+        return null;
 
     }
 
@@ -416,18 +416,18 @@ public class UserDAO {
         }
         return isTaken;
     }
-    
+
     public static boolean updateProfile(User user) {
-        String sql = "UPDATE Users SET LastName = ?, dob = ?, phoneNumber = ?, Bio = ? WHERE UserID = ?";
+        String sql = "UPDATE Users SET FirstName = ?, LastName = ?, dob = ?, phoneNumber = ?, Bio = ? WHERE UserID = ?";
 
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, user.getLastName());
-            stmt.setDate(2, user.getDob() != null ? new java.sql.Date(user.getDob().getTime()) : null);
-            stmt.setString(3, user.getPhoneNumber());
-            stmt.setString(4, user.getBio());
-            stmt.setInt(5, user.getUserID());
+            stmt.setString(1, user.getFirstName());
+            stmt.setString(2, user.getLastName());
+            stmt.setDate(3, user.getDob() != null ? new java.sql.Date(user.getDob().getTime()) : null);
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setString(5, user.getBio());
+            stmt.setInt(6, user.getUserID());
 
             int rowsUpdated = stmt.executeUpdate();
             return rowsUpdated > 0;
