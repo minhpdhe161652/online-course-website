@@ -4,8 +4,8 @@
  */
 package model;
 
-
 public class User {
+
     private int userID;
     private String username;
     private String password;
@@ -17,11 +17,14 @@ public class User {
     private boolean isActive;
     private String avatar;
     private String bio;
-    
-    
-    // Constructor, getters, setters
+    private int balance;
+    private String resetOTP;
 
-    public User(int userID, String username, String password, String firstName, String lastName, String email, int roleID, String registrationDate, boolean isActive, String avatar, String bio) {
+    // Constructor, getters, setters
+    public User() {
+    }
+
+    public User(int userID, String username, String password, String firstName, String lastName, String email, int roleID, String registrationDate, boolean isActive, String avatar, String bio, int balance, String resetOTP) {
         this.userID = userID;
         this.username = username;
         this.password = password;
@@ -33,10 +36,8 @@ public class User {
         this.isActive = isActive;
         this.avatar = avatar;
         this.bio = bio;
-    }
-
-    public User() {
-        // Default constructor
+        this.balance = balance;
+        this.resetOTP = resetOTP;
     }
 
     public int getUserID() {
@@ -127,5 +128,20 @@ public class User {
         this.bio = bio;
     }
 
-    
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
+    }
+
+    public String getResetOTP() {
+        return resetOTP;
+    }
+
+    public void setResetOTP(String resetOTP) {
+        this.resetOTP = resetOTP;
+    }
+
 }

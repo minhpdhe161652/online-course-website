@@ -91,7 +91,7 @@
 
                 <div class="text-center mt-3">
                     <p>Don't have an account? <a href="${pageContext.request.contextPath}/register/learner/registerLearner.jsp">Register as Learner</a></p>
-                    <p><a href="${pageContext.request.contextPath}/auth/forgotPassword.jsp">Forgot Password?</a></p>
+                    <p><a href="${pageContext.request.contextPath}/forgot-password">Forgot Password?</a></p>
                 </div>
             </form>
         </div>
