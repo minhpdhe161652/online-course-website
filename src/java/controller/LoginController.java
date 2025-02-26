@@ -18,12 +18,17 @@ import java.util.logging.Logger;
  */
 
 @WebServlet(name = "loginServlet", value = "/login")
-public class Login extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(Login.class.getName());
-    private final UserDAO usersDAO;
+public class LoginController extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
+    
+    UserDAO usersDAO = new UserDAO();
 
-    public Login() {
-        this.usersDAO = new UserDAO();
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+        doGet(request, response);
     }
 
     @Override
@@ -35,8 +40,8 @@ public class Login extends HttpServlet {
             String password = request.getParameter("password");
 
             // Validate input
-            if (username == null || password == null || 
-                username.isEmpty() || password.isEmpty()) {
+            if (username == null || password == null
+                    || username.isEmpty() || password.isEmpty()) {
                 request.setAttribute("error", "Username and password are required.");
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
                 return;
@@ -52,16 +57,16 @@ public class Login extends HttpServlet {
                 session.setAttribute("userID", user.getUserID());
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("roleID", user.getRoleID());
-                
+
                 LOGGER.log(Level.INFO, "User logged in successfully: {0}", username);
 
                 // Redirect based on role
                 switch (user.getRoleID()) {
                     case 1: // Learner
-                        response.sendRedirect(request.getContextPath() + "/index.jsp");
+                        response.sendRedirect(request.getContextPath() + "/home");
                         break;
                     case 2: // Instructor
-                        response.sendRedirect(request.getContextPath() + "/index.jsp");
+                        response.sendRedirect(request.getContextPath() + "/home");
                         break;
                     case 3: // Admin
                         response.sendRedirect("./admin/users");
@@ -91,20 +96,20 @@ public class Login extends HttpServlet {
             User user = (User) session.getAttribute("user");
             switch (user.getRoleID()) {
                 case 1:
-                    response.sendRedirect(request.getContextPath() + "/learner/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/index.jsp");
                     break;
                 case 2:
-                    response.sendRedirect(request.getContextPath() + "/instructor/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/index.jsp");
                     break;
                 case 3:
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/user-list.jsp");
                     break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
             return;
         }
-        
+
         // Forward to login page
         request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
     }

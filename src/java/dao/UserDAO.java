@@ -10,11 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import model.User;
 import util.DBUtil;
+import util.ForgotPassword;
 
 public class UserDAO {
 
     public static User getProfile(String username) {
-        String query = "SELECT UserID, Username, Password, FirstName, LastName, Email, RoleID, RegistrationDate, IsActive, Avatar, Bio, StoredSalt, ProviderID, WalletID "
+        String query = "SELECT UserID, Username, Password, FirstName, LastName, Email, RoleID, RegistrationDate, IsActive, Avatar, Bio, StoredSalt, ProviderID, WalletID, Balance, ResetOTP "
                 + "FROM Users WHERE Username = ?";
 
         try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -34,11 +35,12 @@ public class UserDAO {
                         rs.getString("RegistrationDate"),
                         rs.getBoolean("IsActive"),
                         rs.getString("Avatar"),
-                        rs.getString("Bio")
+                        rs.getString("Bio"),
+                        rs.getInt("Balance"),
+                        rs.getString("ResetOTP")
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
         }
         return null; // Nếu không tìm thấy User
 
@@ -64,7 +66,6 @@ public class UserDAO {
                 users.add(user);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
         }
         return users;
     }
@@ -239,7 +240,7 @@ public class UserDAO {
     }
 
     public User getUserByEmail(String email) throws Exception {
-        String sql = "Select * from [users] where email = ?";
+        String sql = "Select * from [Users] where email = ?";
         try (Connection connection = DBUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
             ResultSet rs = statement.executeQuery();
@@ -256,17 +257,17 @@ public class UserDAO {
                 user.setIsActive(rs.getBoolean("IsActive"));
                 user.setAvatar(rs.getString("Avatar"));
                 user.setBio(rs.getString("Bio"));
+                user.setResetOTP(rs.getString("ResetOTP"));
                 return user;
             }
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-
         return null;
     }
 
     public void changePassword(String pass, int id) throws Exception {
-        String sql = "update [Users] set Password=? where UserID = ?";
+        String sql = "update [Users] set Password = ? where UserID = ?";
         try (
                 Connection connection = DBUtil.getConnection(); PreparedStatement pre = connection.prepareStatement(sql)) {
             pre.setString(1, pass);
@@ -324,29 +325,26 @@ public class UserDAO {
         try (Connection connection = DBUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
             statement.setString(2, password);
-            ResultSet rs = statement.executeQuery();
-            rs = statement.executeQuery();
-
-            if (rs.next()) {
-                user = new User();
-                user.setUserID(rs.getInt("UserID"));
-                user.setUsername(rs.getString("Username"));
-                user.setPassword(""); // Don't send password back
-                user.setFirstName(rs.getString("FirstName"));
-                user.setLastName(rs.getString("LastName"));
-                user.setEmail(rs.getString("Email"));
-                user.setRoleID(rs.getInt("RoleID"));
-                String registrationDateStr = user.getRegistrationDate();  // Giả sử đây là String
-                java.util.Date registrationDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(registrationDateStr);  // Chuyển String thành Date
-                statement.setTimestamp(7, new java.sql.Timestamp(registrationDate.getTime()));  // Chuyển Date thành Timestamp
-                user.setIsActive(rs.getBoolean("IsActive"));
-                user.setAvatar(rs.getString("Avatar"));
-                user.setBio(rs.getString("Bio"));
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    user = new User();
+                    user.setUserID(rs.getInt("UserID"));
+                    user.setUsername(rs.getString("Username"));
+                    user.setPassword(""); // Don't send password back
+                    user.setFirstName(rs.getString("FirstName"));
+                    user.setLastName(rs.getString("LastName"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setRoleID(rs.getInt("RoleID"));
+                    String registrationDateStr = user.getRegistrationDate();  // Giả sử đây là String
+                    java.util.Date registrationDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(registrationDateStr);  // Chuyển String thành Date
+                    statement.setTimestamp(7, new java.sql.Timestamp(registrationDate.getTime()));  // Chuyển Date thành Timestamp
+                    user.setIsActive(rs.getBoolean("IsActive"));
+                    user.setAvatar(rs.getString("Avatar"));
+                    user.setBio(rs.getString("Bio"));
+                }
             }
-            rs.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return user;
     }
@@ -356,14 +354,13 @@ public class UserDAO {
         String sql = "SELECT COUNT(*) FROM Users WHERE Username = ?";
         try (Connection connection = DBUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                isTaken = rs.getInt(1) > 0;
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    isTaken = rs.getInt(1) > 0;
+                }
             }
-            rs.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return isTaken;
 
@@ -374,14 +371,13 @@ public class UserDAO {
         String sql = "SELECT COUNT(*) FROM Users WHERE Email = ?";
         try (Connection connection = DBUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                isTaken = rs.getInt(1) > 0;
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    isTaken = rs.getInt(1) > 0;
+                }
             }
-            rs.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return isTaken;
 
@@ -402,15 +398,55 @@ public class UserDAO {
             statement.setTimestamp(7, new java.sql.Timestamp(registrationDate.getTime()));  // Chuyển Date thành Timestamp
             statement.setBoolean(8, learner.isIsActive());
 
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                isTaken = rs.getInt(1) > 0;
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    isTaken = rs.getInt(1) > 0;
+                }
             }
-            rs.close();
             statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return isTaken;
+    }
+
+    public void createResetOTP(String email) {
+        String resetOTP = ForgotPassword.generateRandomString();
+        ForgotPassword.sendEmail(email, resetOTP);
+        String sql = "Update [Users] set ResetOTP = ? where Email = ?";
+        try (
+                Connection connection = DBUtil.getConnection(); PreparedStatement pre = connection.prepareStatement(sql)) {
+            pre.setString(1, resetOTP);
+            pre.setString(2, email);
+            pre.executeUpdate();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public User getUserByEmailAndResetOTP(String email, String resetOTP) throws Exception {
+        String sql = "Select * from [Users] where Email = ? AND ResetOTP = ?";
+        try (Connection connection = DBUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            statement.setString(2, resetOTP);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserID(rs.getInt("UserID"));
+                user.setUsername(rs.getString("Username"));
+                user.setPassword(rs.getString("Password"));
+                user.setFirstName(rs.getString("Firstname"));
+                user.setLastName(rs.getString("Lastname"));
+                user.setEmail(rs.getString("Email"));
+                user.setRoleID(rs.getInt("RoleID"));
+                user.setRegistrationDate(rs.getString("RegistrationDate"));
+                user.setIsActive(rs.getBoolean("IsActive"));
+                user.setAvatar(rs.getString("Avatar"));
+                user.setBio(rs.getString("Bio"));
+                return user;
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        return null;
     }
 }

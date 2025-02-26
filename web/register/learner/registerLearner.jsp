@@ -92,7 +92,7 @@
                 <button type="submit" class="btn btn-primary w-100">Register</button>
                 
                 <div class="text-center mt-3">
-                    <p>Already have an account? <a href="login.jsp">Login here</a></p>
+                    <p>Already have an account? <a href="${pageContext.request.contextPath}/login">Login here</a></p>
                 </div>
             </form>
         </div>

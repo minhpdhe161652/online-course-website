@@ -6,67 +6,53 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import util.ForgotPassword;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.User;
 
 @WebServlet(name = "forgotPasswordServlet", value = "/forgot-password")
 public class ForgotPasswordController extends HttpServlet {
+
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        doGet(request, response);
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.getRequestDispatcher("./forgot-password.jsp").forward(request, response);
     }
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
-        response.setContentType("text/html;charset=UTF-8");
-        String email = request.getParameter("email").trim();
-
-        UserDAO userDAO = new UserDAO();
-
-        if(userDAO.checkAccountBlock(email)){
-            if (userDAO.isEmailExist(email)) {
-                ForgotPassword forgot = new ForgotPassword();
-                String new_pass = forgot.getNewPassword();
-                boolean sent = true;
-
-                if(sent){
-                    UserDAO adao = new UserDAO();
-
-                    if (userDAO.getUserByEmail(email) != null) {
-                        adao.changePassword(new_pass, userDAO.getUserByEmail(email).getUserID());
-                    } else {
-                        adao.changePassword(new_pass, userDAO.getUserByEmail(email).getUserID());
-                    }
-                    request.setAttribute("success", "Reset password successfully! Please check your mail.");
-                    request.getRequestDispatcher("./login.jsp").forward(request, response);
-                } else {
-                    request.setAttribute("mess", "Can not send mail.");
-                    request.setAttribute("last_email", email);
-                    request.getRequestDispatcher("./forgot-password.jsp").forward(request, response);
-                }
-            }
-            else {
-                request.setAttribute("mess", "Email is not linked to an account");
-                request.setAttribute("last_email", email);
-                request.getRequestDispatcher("./forgot-password.jsp").forward(request, response);
-            }
-        }else {
-            request.setAttribute("mess", "Account is blocked");
-            request.setAttribute("last_email", email);
-            request.getRequestDispatcher("./forgot-password.jsp").forward(request, response);
-        }
-
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        String email = request.getParameter("email");
+
+        // Kiểm tra email có trống hay không
+        if (email == null || email.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Email cannot be empty.");
+            request.getRequestDispatcher("/forgot-password.jsp").forward(request, response);
+            return;
+        }
+        UserDAO userDAO = new UserDAO();
         try {
-            processRequest(request, response);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            User u = userDAO.getUserByEmail(email);
+            if (u == null) {
+                request.setAttribute("errorMessage", "Has not found the mail in the database.");
+                request.getRequestDispatcher("/forgot-password.jsp").forward(request, response);
+            } else {
+                userDAO.createResetOTP(email);
+                request.setAttribute("email", email);
+                request.setAttribute("successMessage", "A reset OTP has been sent to your mail. Please check then fill your reset OTP into the box.");
+                request.getRequestDispatcher("/forgot-otp.jsp").forward(request, response);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ForgotPasswordController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
