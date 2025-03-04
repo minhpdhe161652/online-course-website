@@ -13,17 +13,22 @@ import java.util.Date;
 public class Enrollment {
     private int enrollmentId;
     private int courseId;
-    private int userId;
+    private int studentId;
     private Date enrollmentDate;
+    private boolean isCompleted; 
+    private Date completionDate; 
 
     public Enrollment() {
     }
 
-    public Enrollment(int enrollmentId, int courseId, int userId, Date enrollmentDate) {
+    public Enrollment(int enrollmentId, int courseId, int studentId, 
+            Date enrollmentDate, boolean isCompleted, Date completionDate) {
         this.enrollmentId = enrollmentId;
         this.courseId = courseId;
-        this.userId = userId;
+        this.studentId = studentId;
         this.enrollmentDate = enrollmentDate;
+        this.isCompleted = isCompleted;
+        this.completionDate = completionDate;
     }
 
     public int getEnrollmentId() {
@@ -34,8 +39,8 @@ public class Enrollment {
         return courseId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getStudentId() {
+        return studentId;
     }
 
     public Date getEnrollmentDate() {
@@ -50,13 +55,27 @@ public class Enrollment {
         this.courseId = courseId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
     public void setEnrollmentDate(Date enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }
-    
-    
+
+    public boolean isIsCompleted() {
+        return isCompleted;
+    }
+
+    public void setIsCompleted(boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
+
+    public Date getCompletionDate() {
+        return completionDate;
+    }
+
+    public void setCompletionDate(Date completionDate) {
+        this.completionDate = completionDate;
+    }
 }

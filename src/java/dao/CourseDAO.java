@@ -88,8 +88,6 @@ public class CourseDAO {
         }
         return courses;
     }
-    
-    
 
     public List<Course> searchCourses(String keyword) {
         List<Course> courses = new ArrayList<>();

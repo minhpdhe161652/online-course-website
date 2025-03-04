@@ -12,9 +12,9 @@
     <!-- Header -->
     <header class="header">
         <div class="container header-content">
-            <a href="index.jsp" class="logo">LearnHub</a>
+            <a href="home" class="logo">LearnHub</a>
             <nav class="nav-menu">
-                <a href="#courses" class="nav-link">Khóa học</a>
+                <a href="courses" class="nav-link">Khóa học</a>
                 <a href="#categories" class="nav-link">Danh mục</a>
                 <c:choose>
                     <c:when test="${empty sessionScope.user}">

@@ -253,9 +253,9 @@
     <body>
         <form action="courses" method="post">
             <nav class="navbar">
-                <a href="index.jsp" class="logo">LearnHub</a>
+                <a href="home" class="logo">LearnHub</a>
                 <div class="right-nav">
-                    <a href="#" class="my-course-btn">
+                    <a href="enrolled-course" class="my-course-btn">
                         <i class="fas fa-book-open"></i>
                         <span style="margin-left: 0.5rem;">My Courses</span>
                     </a>

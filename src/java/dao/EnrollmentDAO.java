@@ -20,17 +20,20 @@ public class EnrollmentDAO {
     
     public void enrollUser(int transactionID) {
         try (Connection conn = DBUtil.getConnection()) {
-            // Lấy userID & courseID từ transaction
-            String query = "SELECT userID, courseID FROM Transactions WHERE transactionID = ?";
+            // Get userID & courseID from transaction
+            String query = "SELECT UserID, CourseID FROM Transactions t "
+                    + "JOIN TransactionDetails td ON t.TransactionID = td.TransactionID "
+                    + "WHERE t.TransactionID = ?";
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, transactionID);
             var rs = ps.executeQuery();
             if (rs.next()) {
-                int userID = rs.getInt("userID");
-                int courseID = rs.getInt("courseID");
+                int userID = rs.getInt("UserID");
+                int courseID = rs.getInt("CourseID");
 
-                // Thêm vào bảng Enrollment
-                String insertSQL = "INSERT INTO Enrollment (userID, courseID) VALUES (?, ?)";
+                // Insert into CourseEnrollments
+                String insertSQL = "INSERT INTO CourseEnrollments (StudentID, CourseID, EnrollmentDate, IsCompleted, CompletionDate) "
+                        + "VALUES (?, ?, GETDATE(), 0, NULL)";
                 PreparedStatement ps2 = conn.prepareStatement(insertSQL);
                 ps2.setInt(1, userID);
                 ps2.setInt(2, courseID);
@@ -41,24 +44,26 @@ public class EnrollmentDAO {
         }
     }
     
-    public List<EnrolledCourseDTO> getEnrolledCoursesByUserId(int userID) {
+    public List<EnrolledCourseDTO> getEnrolledCoursesByUserId(int userId) {
         List<EnrolledCourseDTO> enrolledCourses = new ArrayList<>();
-        String query = "SELECT e.enrollmentID, e.enrollmentDate, c.courseID, c.courseName " +
-                       "FROM Enrollment e " +
-                       "JOIN Courses c ON e.courseID = c.courseID " +
-                       "WHERE e.userID = ?";
+        String query = "SELECT ce.EnrollmentID, ce.EnrollmentDate, c.CourseID, c.CourseName, ce.IsCompleted "
+                + "FROM CourseEnrollments ce "
+                + "JOIN Courses c ON ce.CourseID = c.CourseID "
+                + "WHERE ce.StudentID = ? "
+                + "ORDER BY ce.EnrollmentDate DESC";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             
-            ps.setInt(1, userID);
+            ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     EnrolledCourseDTO enrollment = new EnrolledCourseDTO(
-                        rs.getInt("enrollmentId"),
-                        rs.getInt("courseID"),
-                        rs.getString("courseName"),
-                        rs.getTimestamp("enrollmentDate")
+                        rs.getInt("EnrollmentID"),
+                        rs.getInt("CourseID"),
+                        rs.getString("CourseName"),
+                        rs.getTimestamp("EnrollmentDate"),
+                        rs.getBoolean("IsCompleted")
                     );
                     enrolledCourses.add(enrollment);
                 }
@@ -70,7 +75,7 @@ public class EnrollmentDAO {
     }
     
     public boolean isUserEnrolled(int userId, int courseId) {
-        String query = "SELECT COUNT(*) FROM Enrollment WHERE userID = ? AND courseID = ?";
+        String query = "SELECT COUNT(*) FROM CourseEnrollments WHERE StudentID = ? AND CourseID = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             

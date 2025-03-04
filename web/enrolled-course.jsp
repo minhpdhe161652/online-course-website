@@ -1,6 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="dto.EnrolledCourseDTO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
     <title>Danh sách lớp đã ghi danh</title>
@@ -55,43 +55,55 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Danh sách lớp đã ghi danh</h2>
+    <c:if test="${sessionScope.user == null || sessionScope.user.roleID != 1}">
+        <c:redirect url="enrolled-courses"/>
+    </c:if>
 
-        <%
-            String error = (String) request.getAttribute("error");
-            if (error != null) {
-        %>
-            <p><%= error %></p>
-        <%
-            } else {
-                List<EnrolledCourseDTO> enrollments = (List<EnrolledCourseDTO>) request.getAttribute("enrollments");
-                if (enrollments != null && !enrollments.isEmpty()) {
-        %>
-            <table>
-                <tr>
-                    <th>Tên khóa học</th>
-                    <th>Ngày Đăng ký</th>
-                </tr>
-                <%
-                    for (EnrolledCourseDTO enrollment : enrollments) {
-                %>
-                    <tr>
-                        <td><%= enrollment.getCourseName() %></td>
-                        <td><%= enrollment.getEnrollmentDate() %></td>
-                    </tr>
-                <%
-                    }
-                %>
-            </table>
-        <%
-                } else {
-        %>
-            <p>Không tìm thấy dữ liệu.</p>
-        <%
-                }
-            }
-        %>
+    <div class="container">
+        <h2>Enrolled Courses</h2>
+
+        <c:if test="${not empty requestScope.error}">
+            <p class="error">${requestScope.error}</p>
+        </c:if>
+
+        <c:if test="${empty requestScope.error}">
+            <c:choose>
+                <c:when test="${not empty requestScope.enrollments}">
+                    <table>
+                        <tr>
+                            <th>Course Name</th>
+                            <th>Enrolled Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <c:forEach items="${requestScope.enrollments}" var="enrollment">
+                            <tr>
+                                <td>${enrollment.courseName}</td>
+                                <td><fmt:formatDate value="${enrollment.enrollmentDate}" pattern="dd/MM/yyyy"/></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${enrollment.completed}">
+                                            <span style="color: green">Completed</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span style="color: orange">Learning</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <a href="learn/course-dashboard?courseID=${enrollment.courseID}" class="btn btn-primary">
+                                        Go to course
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                </c:when>
+                <c:otherwise>
+                    <p>Not enrolled any course</p>
+                </c:otherwise>
+            </c:choose>
+        </c:if>
     </div>
 </body>
 </html>
