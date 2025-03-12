@@ -61,21 +61,21 @@ public class ProfileController extends HttpServlet {
     throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         
-//        if (session != null && session.getAttribute("username") != null) {
-//            String username = (String) session.getAttribute("username"); // Lấy username từ session
-//            
-//            // Gọi DAO để lấy thông tin user từ username
-//            User user = UserDAO.getProfile(username);
-//            
-//            if (user != null) {
-//                request.setAttribute("user", user);
-//                request.getRequestDispatcher("user-profile.jsp").forward(request, response);
-//            } else {
-//                response.getWriter().println("User not found!");
-//            }
-//        } else {
-//            response.getWriter().println("No user logged in!");
-//        }
+        if (session != null && session.getAttribute("username") != null) {
+            String username = (String) session.getAttribute("username"); // Lấy username từ session
+            
+            // Gọi DAO để lấy thông tin user từ username
+            User user = UserDAO.getProfile(username);
+            
+            if (user != null) {
+                request.setAttribute("user", user);
+                request.getRequestDispatcher("user-profile.jsp").forward(request, response);
+            } else {
+                response.getWriter().println("User not found!");
+            }
+        } else {
+            response.getWriter().println("No user logged in!");
+        }
 
         User user = UserDAO.getProfile("instructor1");
         request.setAttribute("user", user);

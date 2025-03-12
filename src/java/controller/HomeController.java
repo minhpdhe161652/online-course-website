@@ -31,6 +31,10 @@ public class HomeController extends HttpServlet {
             CourseDAO courseDAO = new CourseDAO();
             List<Course> featuredCourses = courseDAO.getFeaturedCourses();
             request.setAttribute("featuredCourses", featuredCourses);
+            
+            // Get latest approved courses
+            List<Course> latestCourses = courseDAO.getLatestApprovedCourses(6); // Hiển thị 6 khóa học mới nhất
+            request.setAttribute("latestCourses", latestCourses);
 
             // Get categories
             CategoryDAO categoryDAO = new CategoryDAO();

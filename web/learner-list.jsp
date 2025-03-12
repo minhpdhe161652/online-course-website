@@ -8,6 +8,25 @@
     <title>Quản lý Learner | Learning Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
+    <style>
+        .course-approval-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .course-approval-btn i {
+            margin-right: 5px;
+        }
+        .course-approval-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -38,6 +57,12 @@
             <c:remove var="errorMessage" scope="session" />
         </div>
     </c:if>
+    
+    <div style="text-align: center;">
+        <a href="${pageContext.request.contextPath}/admin/course-approval" class="course-approval-btn">
+            <i class="fas fa-clipboard-check"></i> Phê duyệt khóa học
+        </a>
+    </div>
     
     <div class="sort-section">
         <span><i class="fas fa-sort"></i> Sắp xếp theo:</span>
